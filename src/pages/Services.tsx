@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, Package, FileText, Heart, Truck, Building2 } from "lucide-react";
+import { Home, Package, FileText, Heart, Truck, Building2, Link } from "lucide-react";
 import ServiceCard from "@/components/ServiceCard";
 import { Country, COUNTRIES } from "@/lib/countries";
 import SEOHead from "@/components/SEOHead";
@@ -30,6 +30,14 @@ const Services = () => {
       icon: Package,
       href: selectedCountry ? `/create/${selectedCountry.code}/shipping` : "#",
       gradient: "var(--gradient-success)",
+    },
+    {
+      title: "External Links",
+      titleAr: "الروابط الخارجية",
+      description: "إنشاء روابط دفع فريدة ومستقلة",
+      icon: Link,
+      href: "/external-links",
+      gradient: "linear-gradient(135deg, hsl(280 95% 55%), hsl(300 90% 60%))",
     },
     {
       title: "Invoices",
