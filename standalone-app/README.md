@@ -1,13 +1,13 @@
-# Gulf Unified Platform - Standalone App
+# Gulf Unified Platform - Enhanced for Multiple Links
 
-This is a standalone version of the Gulf Unified Platform that can generate multiple payment links simultaneously without interfering with the main application.
+This is the same Gulf Unified Platform application with enhanced capabilities to generate multiple payment links simultaneously without any interference.
 
 ## Features
 
-- **Independent Database**: Uses separate database tables with `standalone_` prefix
+- **Same Database**: Uses the same database tables as the main application
 - **Multiple Link Generation**: Can create multiple shipping and chalet payment links simultaneously
 - **Same Design & Functionality**: Identical UI/UX and features as the main app
-- **Isolated Environment**: Completely separate from the main application
+- **Enhanced Concurrency**: Improved handling of simultaneous link creation
 
 ## Quick Setup
 
@@ -29,15 +29,7 @@ Update `.env` with your Supabase URL and API key.
 
 ### 3. Set Up Database
 
-Run the database migration to create the standalone tables:
-
-```bash
-# If using Supabase CLI
-supabase db push
-
-# Or manually run the migration file:
-# supabase/migrations/20250101000000_standalone_schema.sql
-```
+The application uses the same database as the main application. No additional setup required.
 
 ### 4. Start Development Server
 
@@ -47,15 +39,14 @@ npm run dev
 
 The app will be available at `http://localhost:5173`
 
-## Database Schema
+## Enhanced Features
 
-The standalone app uses separate tables to avoid conflicts:
+The application includes improved concurrency handling:
 
-- `standalone_chalets` - Chalet listings
-- `standalone_shipping_carriers` - Shipping service providers
-- `standalone_providers` - Service providers
-- `standalone_links` - Generated payment links
-- `standalone_payments` - Payment transactions
+- **Better UUID Generation**: Uses timestamp-based UUIDs to prevent collisions
+- **Retry Logic**: Automatically retries link creation if conflicts occur
+- **Concurrent Safety**: Multiple users can create links simultaneously
+- **Same Database**: Uses existing database tables with enhanced conflict resolution
 
 ## Usage
 
@@ -80,8 +71,9 @@ You can create multiple links simultaneously by:
 - Opening multiple browser tabs/windows
 - Using different browsers
 - Running multiple instances of the app
+- Multiple users accessing the app at the same time
 
-Each link will be completely independent and stored in the standalone database.
+Each link will be completely independent and stored in the same database with enhanced conflict resolution.
 
 ## Deployment
 
@@ -107,11 +99,11 @@ npm run build
 
 ## Differences from Main App
 
-- Uses `standalone_` prefixed database tables
-- Independent database schema
-- Can run simultaneously with main app
-- Separate environment configuration
-- Isolated link generation
+- Enhanced UUID generation with timestamp
+- Improved retry logic for concurrent operations
+- Better error handling for simultaneous link creation
+- Same database and functionality
+- Optimized for multiple simultaneous users
 
 ## Support
 

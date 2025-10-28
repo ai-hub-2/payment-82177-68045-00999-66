@@ -13,7 +13,6 @@ const requiredFiles = [
   'package.json',
   'src/App.tsx',
   'src/hooks/useSupabase.ts',
-  'supabase/migrations/20250101000000_standalone_schema.sql',
   '.env.example'
 ];
 
@@ -38,23 +37,23 @@ if (packageJson.name === 'gulf-unified-platform-standalone') {
   allFilesExist = false;
 }
 
-// Check if useSupabase.ts uses standalone tables
+// Check if useSupabase.ts has enhanced concurrency features
 const useSupabaseContent = fs.readFileSync(path.join(__dirname, 'src/hooks/useSupabase.ts'), 'utf8');
-if (useSupabaseContent.includes('standalone_links')) {
-  console.log('✅ useSupabase.ts uses standalone tables');
+if (useSupabaseContent.includes('retries') && useSupabaseContent.includes('Date.now()')) {
+  console.log('✅ useSupabase.ts has enhanced concurrency features');
 } else {
-  console.log('❌ useSupabase.ts does not use standalone tables');
+  console.log('❌ useSupabase.ts missing concurrency enhancements');
   allFilesExist = false;
 }
 
 console.log('\n' + '='.repeat(50));
 
 if (allFilesExist) {
-  console.log('🎉 Standalone app setup is complete!');
+  console.log('🎉 Enhanced app setup is complete!');
   console.log('\nNext steps:');
   console.log('1. Update .env with your Supabase credentials');
-  console.log('2. Run database migration');
-  console.log('3. Start the app with: npm run dev');
+  console.log('2. Start the app with: npm run dev');
+  console.log('3. Test multiple link generation simultaneously');
 } else {
   console.log('❌ Some issues found. Please check the errors above.');
 }

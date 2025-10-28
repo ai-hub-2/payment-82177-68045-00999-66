@@ -60,7 +60,7 @@ export const useChalets = (countryCode?: string) => {
   return useQuery({
     queryKey: ["chalets", countryCode],
     queryFn: async () => {
-      let query = (supabase as any).from("standalone_chalets").select("*");
+      let query = (supabase as any).from("chalets").select("*");
       
       if (countryCode) {
         query = query.eq("country_code", countryCode);
@@ -80,7 +80,7 @@ export const useShippingCarriers = (countryCode?: string) => {
   return useQuery({
     queryKey: ["carriers", countryCode],
     queryFn: async () => {
-      let query = (supabase as any).from("standalone_shipping_carriers").select("*");
+      let query = (supabase as any).from("shipping_carriers").select("*");
       
       if (countryCode) {
         query = query.eq("country_code", countryCode);
@@ -107,29 +107,53 @@ export const useCreateLink = () => {
       provider_id?: string;
       payload: any;
     }) => {
-      const linkId = crypto.randomUUID();
-      const micrositeUrl = `${window.location.origin}/r/${linkData.country_code}/${linkData.type}/${linkId}`;
-      const paymentUrl = `${window.location.origin}/pay/${linkId}`;
+      // Generate a more unique ID with timestamp to prevent collisions
+      let linkId = crypto.randomUUID() + '-' + Date.now();
+      let micrositeUrl = `${window.location.origin}/r/${linkData.country_code}/${linkData.type}/${linkId}`;
+      let paymentUrl = `${window.location.origin}/pay/${linkId}`;
       
       // Simple signature (in production, use HMAC)
       // Use encodeURIComponent to handle Arabic and other Unicode characters
       const signature = btoa(encodeURIComponent(JSON.stringify(linkData.payload)));
       
-      const { data, error } = await (supabase as any)
-        .from("standalone_links")
-        .insert({
-          id: linkId,
-          type: linkData.type,
-          country_code: linkData.country_code,
-          provider_id: linkData.provider_id,
-          payload: linkData.payload,
-          microsite_url: micrositeUrl,
-          payment_url: paymentUrl,
-          signature,
-          status: "active",
-        })
-        .select()
-        .single();
+      // Retry logic for concurrent insertions
+      let retries = 3;
+      let data, error;
+      
+      while (retries > 0) {
+        const result = await (supabase as any)
+          .from("links")
+          .insert({
+            id: linkId,
+            type: linkData.type,
+            country_code: linkData.country_code,
+            provider_id: linkData.provider_id,
+            payload: linkData.payload,
+            microsite_url: micrositeUrl,
+            payment_url: paymentUrl,
+            signature,
+            status: "active",
+          })
+          .select()
+          .single();
+        
+        data = result.data;
+        error = result.error;
+        
+        if (!error) break;
+        
+        // If it's a duplicate key error, generate new ID and retry
+        if (error.code === '23505' && retries > 1) {
+          const newLinkId = crypto.randomUUID() + '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+          linkId = newLinkId;
+          micrositeUrl = `${window.location.origin}/r/${linkData.country_code}/${linkData.type}/${newLinkId}`;
+          paymentUrl = `${window.location.origin}/pay/${newLinkId}`;
+          retries--;
+          continue;
+        }
+        
+        break;
+      }
       
       if (error) throw error;
       return data as Link;
@@ -157,7 +181,7 @@ export const useLink = (linkId?: string) => {
     queryKey: ["link", linkId],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("standalone_links")
+        .from("links")
         .select("*")
         .eq("id", linkId!)
         .single();
@@ -183,7 +207,7 @@ export const useCreatePayment = () => {
       const otp = Math.floor(1000 + Math.random() * 9000).toString();
       
       const { data, error } = await (supabase as any)
-        .from("standalone_payments")
+        .from("payments")
         .insert({
           ...paymentData,
           otp,
@@ -212,7 +236,7 @@ export const usePayment = (paymentId?: string) => {
     queryKey: ["payment", paymentId],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("standalone_payments")
+        .from("payments")
         .select("*")
         .eq("id", paymentId!)
         .single();
@@ -239,7 +263,7 @@ export const useUpdatePayment = () => {
       updates: Partial<Payment>;
     }) => {
       const { data, error } = await (supabase as any)
-        .from("standalone_payments")
+        .from("payments")
         .update(updates)
         .eq("id", paymentId)
         .select()
